@@ -5,6 +5,9 @@
  */
 package ClassLibrary;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -14,7 +17,7 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author zeroxff
+ * @author Cory Sabol
  */
 public class CmdReplTest {
     
@@ -45,7 +48,11 @@ public class CmdReplTest {
         System.out.println("startRepl");
         String prompt = "";
         CmdRepl instance = null;
-        instance.startRepl(prompt);
+        try {
+            instance.startRepl(prompt);
+        } catch (IOException ex) {
+            Logger.getLogger(CmdReplTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
