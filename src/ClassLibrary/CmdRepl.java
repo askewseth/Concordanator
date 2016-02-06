@@ -13,12 +13,13 @@ import java.io.*;
  * 
  * This class depends on the Concordance class. 
  */
-public class CmdRepl {
+public class CmdRepl implements Serializable {
     
     private String[] args;
     private boolean exit = false;
     private String prompt = "> ";
-    private BufferedReader reader = new BufferedReader();
+    private InputStreamReader reader = new InputStreamReader(System.in);
+    private BufferedReader in = new BufferedReader(reader);
     
     /***
      * Constuctor for the repl.
@@ -38,7 +39,7 @@ public class CmdRepl {
     /***
      * Start the interactive interface to of the program.
      */
-    public void startRepl(String prompt) {
+    public void startRepl(String prompt) throws IOException {
         this.args = args;
         
         if (!prompt.isEmpty() && prompt.length() < 5 && prompt.endsWith(" ")) {
@@ -65,7 +66,7 @@ public class CmdRepl {
         do {
             
             System.out.print(this.prompt);
-            reader.
+            in.readLine();
             
         } while (!exit);
     }
