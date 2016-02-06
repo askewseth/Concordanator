@@ -5,6 +5,10 @@
  */
 package ClassLibrary;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author zeroxff
@@ -21,8 +25,12 @@ public class Main {
         
         // Create a new repl
         CmdRepl repl = new CmdRepl(args);
-        // Start the repl or gui depending on what is in the args
-        // This is essentially the entry point into all the good stuff :^)
-        repl.startRepl("");
+        try {
+            // Start the repl or gui depending on what is in the args
+            // This is essentially the entry point into all the good stuff :^)
+            repl.startRepl("");
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
