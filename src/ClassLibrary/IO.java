@@ -58,11 +58,11 @@ public class IO<T> implements Serializable {
             in.close();
             
         } catch (FileNotFoundException ex) {
-            //Logger.getLogger(IO.class.getName()).log(Level.SEVERE, null, ex);
+           Logger.getLogger(IO.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            //Logger.getLogger(IO.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(IO.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
-            //Logger.getLogger(IO.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(IO.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return this.obj;

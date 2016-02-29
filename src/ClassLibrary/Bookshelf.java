@@ -45,7 +45,6 @@ public final class Bookshelf {
             this.bookDirectory = this.userDir + File.separator + "src" + File.separator + "books";
         }
         this.inventoryBooks();  // Search the folder for Gutenberg books and add them to the shelf.
-        System.out.println(this.bookDirectory);
     }
 
     // Class methods

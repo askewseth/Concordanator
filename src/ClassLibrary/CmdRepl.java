@@ -37,6 +37,10 @@ public class CmdRepl implements Serializable {
     private String concordDirectory;   // Holds the exact path of the concordance based on the user's OS environment.
     private final String booksDir;
     private final boolean isWin;
+    private final ArrayList<String> commonWords;
+    private final String COMMON_WORDS_FILE = "commonwords.txt";
+    private String commonWordFile;
+    private boolean commonWordsAvailable;
 
     private enum Commands {
         load, 
@@ -65,7 +69,9 @@ public class CmdRepl implements Serializable {
        this.in = new BufferedReader(reader);
        this.exit = false;
        this.conLoaded = false;
+       this.commonWords = new ArrayList<String>();
        this.shelf = new Bookshelf();
+       
        
        this.userDir = System.getProperty("user.dir");
        
@@ -79,14 +85,16 @@ public class CmdRepl implements Serializable {
            this.isWin = false;
        }
        
-        this.concordDirectory = this.userDir + File.separator + CONCORD_DIRECTORY;    // set the book directory.
+        this.concordDirectory = this.userDir + File.separator + CONCORD_DIRECTORY;    // set the concordance directory.
+        this.commonWordFile = this.userDir + File.separator + "ClassLibrary" + File.separator + this.COMMON_WORDS_FILE;
         if (!new File(this.concordDirectory).isDirectory()) {
             // This checks to see if the concordance directory is present in the command line.
             // If not, then user is running in Netbeans and the proper folder will be appended.
-            this.concordDirectory = this.userDir + File.separator + "src" + File.separator + "books";
+            this.concordDirectory = this.userDir + File.separator + "src" + File.separator + CONCORD_DIRECTORY;
+            this.commonWordFile = this.userDir + File.separator + "src" + File.separator + "ClassLibrary" + File.separator + this.COMMON_WORDS_FILE;
         }
-       
-       //System.out.println("Con dir: " + this.conDir);
+        
+        this.commonWordsAvailable = this.populateCommonWords();
     }
     
     /***
@@ -171,7 +179,7 @@ public class CmdRepl implements Serializable {
                 this.printHelp();
                 break;
             case listbooks :
-                if (cmdArg.toString().equals("[]")) {
+                if (cmdArg.isEmpty()) {
                     this.listbooks();
                 } else {
                     this.listbooks(cmdArg.toString().substring(1, 
@@ -179,7 +187,7 @@ public class CmdRepl implements Serializable {
                 }
                 break;
             case listcons :
-                if (cmdArg.toString().equals("[]")) {
+                if (cmdArg.isEmpty()) {
                     // This section fires if there are no arguments.
                     this.listCords();
                 } else if (cmdArg.size() == 2 && this.isInteger(cmdArg.get(1), 10)){
@@ -210,7 +218,7 @@ public class CmdRepl implements Serializable {
                 if (!conLoaded) {
                     System.out.println("Error: no concordance loaded.");
                 } else {
-					if (cmdArg.toString().equals("[]")) {
+					if (cmdArg.isEmpty()) {
 						// Show a summary of the whole concordance
 						break;
 					} else {
@@ -222,11 +230,12 @@ public class CmdRepl implements Serializable {
                 if (!conLoaded) {
                     System.out.println("Error: no concordance loaded.");
                 } else {
-                	if (cmdArg.toString().equals("[]")) {
+                	if (cmdArg.isEmpty()) {
                     	System.out.println("Incorrect Usage: Number of word occurences requires an argument.");
-                	} else {
-                    	this.numOccurences(cmdArg.toString().substring(1, 
-									cmdArg.toString().length() - 1));
+                	} else if (cmdArg.size() > 1){
+                            System.out.println("Incorrect Usage: Number of occurences requires a single word for search.");
+                        } else {
+                    	this.numOccurences(cmdArg.get(0).trim().toLowerCase());
                 	}
                 }
                 break;
@@ -234,11 +243,13 @@ public class CmdRepl implements Serializable {
                 if (!conLoaded) {
                     System.out.println("Error: no concordance loaded.");
                 } else {
-                	if (cmdArg.toString().equals("[]")) {
+                	if (cmdArg.isEmpty()) {
                     	System.out.println("Incorrect Usage: Number of lines requires an argument.");
-                	} else {
-                    	this.numberOfLines(cmdArg.toString().substring(1, 
-									cmdArg.toString().length() - 1));
+                	} else if (cmdArg.size() > 1){
+                            System.out.println("Incorrect Usage: Number of lines requires a single word for search.");
+                        }                     
+                        else {
+                    	this.numberOfLines(cmdArg.get(0).trim().toLowerCase());
                 	}
                 }
                 break;
@@ -246,11 +257,13 @@ public class CmdRepl implements Serializable {
                 if (!conLoaded) {
                     System.out.println("Error: no concordance loaded.");
                 } else {
-                	if (cmdArg.toString().equals("[]")) {
+                	if (cmdArg.isEmpty()) {
                          System.out.println("Incorrect Usage: Rank requires an argument.");
-                	} else {
-                    	this.rank(cmdArg.toString().substring(1, 
-									cmdArg.toString().length() - 1));
+                	} else if (cmdArg.size() > 1){
+                            System.out.println("Incorrect Usage: Rank requires a single word for search.");
+                        }                     
+                        else {
+                    	this.rank(cmdArg.get(0).trim().toLowerCase());
                 	}
                 }
                 break;
@@ -265,7 +278,7 @@ public class CmdRepl implements Serializable {
                 if (!conLoaded) {
                     System.out.println("Error: no concordance loaded.");
                 } else {
-                 if (cmdArg.toString().equals("[]")) {
+                 if (cmdArg.isEmpty()) {
                          System.out.println("SUCCESS: Concordance unloaded.");
                          this.prompt = "> ";
                          this.conLoaded = false;
@@ -437,8 +450,9 @@ public class CmdRepl implements Serializable {
         } else {
            try {
                System.out.println("Building the concordance. This may take a moment for large books.");
-			   this.concord = new Concord(bookInformation[0], bookInformation[1], bookInformation[2]);
-			   this.conLoaded = true;
+            this.concord = new Concord(bookInformation[0], bookInformation[1], bookInformation[2]);
+            this.prompt = "\n" + bookInformation[0] + " by " +bookInformation[1] + " > ";
+            this.conLoaded = true;
                System.out.println("SUCCESS: The concordance was built and loaded.");
         	} catch (IOException ex) {
 				System.out.println("File Error: The file is not found on the system.");
@@ -447,18 +461,30 @@ public class CmdRepl implements Serializable {
     }
     
     private void numOccurences (String word){
+        if (!this.isCommonWord(word)){
         int temp = concord.get_number_occurrences(word);
         System.out.println("The word " + word + " appears " + temp + " times.");
+        } else {
+            System.out.println("TOO MANY ENTRIES:  The word you are searching for is too common.  Please be more specific.");
+        }
     }
     
     private void numberOfLines(String word){
+        if (!this.isCommonWord(word)){
         int temp = concord.get_number_lines(word);
         System.out.println("The word " + word + " appears on " + temp + " lines.");
+        } else {
+            System.out.println("TOO MANY ENTRIES:  The word you are searching for is too common.  Please be more specific.");
+        }
     }
     
     private void rank(String word){
+        if (!this.isCommonWord(word)){
         int temp = concord.get_appearance_rank(word);
         System.out.println("The word " + word + " is ranked: " + temp);
+        } else {
+            System.out.println("TOO MANY ENTRIES:  The word you are searching for is too common.  Please be more specific.");
+        }
     }
     
         private void addBook(String filePath) {
@@ -497,5 +523,28 @@ public class CmdRepl implements Serializable {
         // there's nothing left!
         sc.nextInt(radix);
         return !sc.hasNext();
+    }
+    
+    private boolean populateCommonWords(){
+        boolean success = false;
+        if (new File(this.commonWordFile).isFile()){
+            File source = new File(this.commonWordFile);
+            try {
+                BufferedReader fileIn = new BufferedReader(new FileReader(source));
+                while (fileIn.ready()){
+                    String temp = fileIn.readLine().trim();
+                    String[] temp2 = temp.split(" ");
+                    this.commonWords.add(temp2[0]);
+            }
+                success = true;
+            } catch(IOException ex){
+                System.out.println("Exception Firing"); 
+            }
+        }
+        return success;
+    }
+    
+    private boolean isCommonWord(String word){
+        return this.commonWords.contains(word);
     }
 }

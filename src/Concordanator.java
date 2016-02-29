@@ -8,8 +8,8 @@ import java.util.logging.Logger;
 public class Concordanator{
     public static void main(String[] args) {
         
-        //ConcordanatorWindow window = new ConcordanatorWindow();
-        //window.setVisible(true);
+        ConcordanatorWindow window = new ConcordanatorWindow();
+        window.setVisible(true);
          // Start the repl from here
         CmdRepl repl = new CmdRepl();
         
@@ -17,7 +17,7 @@ public class Concordanator{
             
             if (args.length != 0 && args[0].equals("gui")) {
                 // Launch the gui from here
-                ConcordanatorWindow window = new ConcordanatorWindow();
+                //ConcordanatorWindow window = new ConcordanatorWindow();
                 window.setVisible(true);
             } else if (args.length == 1 || args.length == 0) {
                 repl.startRepl("");

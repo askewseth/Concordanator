@@ -66,8 +66,17 @@ public class ConcordanatorWindow extends javax.swing.JFrame {
         concordCountLabel = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
+        addBookMenu = new javax.swing.JMenuItem();
+        openBookMenu = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        exitProgramMenu = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
+        buildConcordMenu = new javax.swing.JMenuItem();
+        openConcordMenu = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
+        readMeMenu = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JPopupMenu.Separator();
+        aboutMenu = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("The Concordanator");
@@ -131,6 +140,12 @@ public class ConcordanatorWindow extends javax.swing.JFrame {
         });
 
         openBookBtn.setText("Open Book");
+        openBookBtn.setEnabled(false);
+        openBookBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                openBookBtnActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout booksBtnPanelLayout = new javax.swing.GroupLayout(booksBtnPanel);
         booksBtnPanel.setLayout(booksBtnPanelLayout);
@@ -156,8 +171,10 @@ public class ConcordanatorWindow extends javax.swing.JFrame {
         concordBtnPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         openConcordBtn.setText("Open Concordance");
+        openConcordBtn.setEnabled(false);
 
         buildConcordBtn.setText("Build Concordance");
+        buildConcordBtn.setEnabled(false);
 
         javax.swing.GroupLayout concordBtnPanelLayout = new javax.swing.GroupLayout(concordBtnPanel);
         concordBtnPanel.setLayout(concordBtnPanelLayout);
@@ -258,12 +275,56 @@ public class ConcordanatorWindow extends javax.swing.JFrame {
         );
 
         jMenu1.setText("File");
+
+        addBookMenu.setText("Add New Book");
+        addBookMenu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addBookMenuActionPerformed(evt);
+            }
+        });
+        jMenu1.add(addBookMenu);
+
+        openBookMenu.setText("Open Book");
+        openBookMenu.setEnabled(false);
+        openBookMenu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                openBookMenuActionPerformed(evt);
+            }
+        });
+        jMenu1.add(openBookMenu);
+        jMenu1.add(jSeparator1);
+
+        exitProgramMenu.setText("Exit Program");
+        exitProgramMenu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exitProgramMenuActionPerformed(evt);
+            }
+        });
+        jMenu1.add(exitProgramMenu);
+
         jMenuBar1.add(jMenu1);
 
         jMenu2.setText("Edit");
+
+        buildConcordMenu.setText("Build Concordance");
+        buildConcordMenu.setEnabled(false);
+        jMenu2.add(buildConcordMenu);
+
+        openConcordMenu.setText("Open Concordance");
+        openConcordMenu.setEnabled(false);
+        jMenu2.add(openConcordMenu);
+
         jMenuBar1.add(jMenu2);
 
         jMenu3.setText("Help");
+
+        readMeMenu.setText("View Read Me");
+        jMenu3.add(readMeMenu);
+        jMenu3.add(jSeparator2);
+
+        aboutMenu.setText("About");
+        jMenu3.add(aboutMenu);
+
         jMenuBar1.add(jMenu3);
 
         setJMenuBar(jMenuBar1);
@@ -291,6 +352,7 @@ public class ConcordanatorWindow extends javax.swing.JFrame {
         }
 
         File chosenFile = chooser.getSelectedFile();
+        this.shelf.addNewBook(chosenFile.getAbsolutePath());
     }//GEN-LAST:event_newBookButtonActionPerformed
 
     private void bookSearchBoxKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_bookSearchBoxKeyTyped
@@ -310,6 +372,22 @@ public class ConcordanatorWindow extends javax.swing.JFrame {
         }
         concordList.setModel(concordModel);
     }//GEN-LAST:event_concordSearchBoxKeyTyped
+
+    private void addBookMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addBookMenuActionPerformed
+        this.newBookButton.doClick();
+    }//GEN-LAST:event_addBookMenuActionPerformed
+
+    private void openBookMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openBookMenuActionPerformed
+        this.doubleClickBooks(this.selectedBook);
+    }//GEN-LAST:event_openBookMenuActionPerformed
+
+    private void openBookBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openBookBtnActionPerformed
+        this.doubleClickBooks(this.selectedBook);
+    }//GEN-LAST:event_openBookBtnActionPerformed
+
+    private void exitProgramMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitProgramMenuActionPerformed
+        System.exit(0);
+    }//GEN-LAST:event_exitProgramMenuActionPerformed
 
     /**
      * @param args the command line arguments
@@ -347,17 +425,21 @@ public class ConcordanatorWindow extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem aboutMenu;
+    private javax.swing.JMenuItem addBookMenu;
     private javax.swing.JLabel bookCountLabel;
     private javax.swing.JTextField bookSearchBox;
     private javax.swing.JPanel booksBtnPanel;
     private javax.swing.JList booksList;
     private javax.swing.JPanel booksPanel;
     private javax.swing.JButton buildConcordBtn;
+    private javax.swing.JMenuItem buildConcordMenu;
     private javax.swing.JPanel concordBtnPanel;
     private javax.swing.JLabel concordCountLabel;
     private javax.swing.JList concordList;
     private javax.swing.JTextField concordSearchBox;
     private javax.swing.JPanel concordancePanel;
+    private javax.swing.JMenuItem exitProgramMenu;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -368,15 +450,22 @@ public class ConcordanatorWindow extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JButton newBookButton;
     private javax.swing.JButton openBookBtn;
+    private javax.swing.JMenuItem openBookMenu;
     private javax.swing.JButton openConcordBtn;
+    private javax.swing.JMenuItem openConcordMenu;
     private javax.swing.JPanel outterMostPanel;
+    private javax.swing.JMenuItem readMeMenu;
     // End of variables declaration//GEN-END:variables
-    private Bookshelf shelf;
+    private final Bookshelf shelf;
     private Concord concord;
-    DefaultListModel booksModel;
-    DefaultListModel concordModel;
+    private DefaultListModel booksModel;
+    private DefaultListModel concordModel;
+    private JList selectedBook;
+    private JList selectedConcord;
 
     private void populateGUI() {
         booksModel = new DefaultListModel();
@@ -386,27 +475,28 @@ public class ConcordanatorWindow extends javax.swing.JFrame {
         }
         booksList.setModel(booksModel);
         
-        concordModel = new DefaultListModel();
+        this.concordModel = new DefaultListModel();
         String[] concords = shelf.getAllConcordances();
         for (String concord : concords) {
             concordModel.addElement(concord);
         }
-        concordList.setModel(concordModel);
+        this.concordList.setModel(concordModel);
         
         
-        bookCountLabel.setText(Integer.toString(shelf.getNumberOfBooks()));
-        concordCountLabel.setText(Integer.toString(concordList.getLastVisibleIndex() +1));
-        booksList.addMouseListener(new MouseAdapter() {
+        this.bookCountLabel.setText(Integer.toString(shelf.getNumberOfBooks()));
+        this.concordCountLabel.setText(Integer.toString(concordList.getLastVisibleIndex() +1));
+        this.booksList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent evt) {
                 JList list = (JList) evt.getSource();
                 if (evt.getClickCount() == 1) {
 
                     // Single-click detected
+                    singleClickBooks(list);
                 } else if (evt.getClickCount() == 2) {
 
                     // Double-click detected
-                    doubleClick(list);
+                    doubleClickBooks(list);
 
                 } else if (evt.getClickCount() == 3) {
 
@@ -415,10 +505,37 @@ public class ConcordanatorWindow extends javax.swing.JFrame {
                 }
             }
         });
-        //this.booksList = new javax.swing.JList(shelf.getAllBookTitles());
+        this.concordList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
+                JList list = (JList) evt.getSource();
+                if (evt.getClickCount() == 1) {
+
+                    // Single-click detected
+                    singleClickConcords(list);
+                } else if (evt.getClickCount() == 2) {
+
+                    // Double-click detected
+                    doubleClickConcords(list);
+
+                } else if (evt.getClickCount() == 3) {
+
+                    // Triple-click detected
+                    int index = list.locationToIndex(evt.getPoint());
+                }
+            }
+        });
+    }
+    
+    private void singleClickBooks(JList list){
+        this.selectedBook = list;
+        this.openBookMenu.setEnabled(true);
+        this.openBookBtn.setEnabled(true);
+        this.buildConcordBtn.setEnabled(true);
+        this.buildConcordMenu.setEnabled(true);
     }
 
-    private void doubleClick(JList list) {
+    private void doubleClickBooks(JList list) {
         String[] bookCreds = shelf.pullBook(list.getSelectedValue().toString());
         File file = new File(bookCreds[2]);
         if (System.getProperty("os.name").toLowerCase().contains("windows")) {
@@ -437,5 +554,16 @@ public class ConcordanatorWindow extends javax.swing.JFrame {
                 Logger.getLogger(ConcordanatorWindow.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+    }
+    
+    private void singleClickConcords(JList list){
+        this.selectedConcord = list;
+        this.openConcordMenu.setVisible(true);
+        this.openConcordBtn.setVisible(true);
+        
+    }
+    
+    private void doubleClickConcords(JList list){
+        
     }
 }
