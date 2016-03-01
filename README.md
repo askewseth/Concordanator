@@ -22,10 +22,10 @@ Seth Askew
 
 ## Building and running from the command line, like a real man/woman >:^)
 1. `cd` into the root dir of the project.
-2. execute `javac -sourcepath src src/ClassLibrary/Main.java -d build/`
-3. Once that's done execute `java -cp build ClassLibrary.Main`
-4. if that doesn't work then try `java -cp build ClassLibrary/Main`
-4. Enjoy your concordances.
+2. `mkdir build`
+3. execute `javac -sourcepath src src/Concordanator.java -d build/`
+4. Once that's done execute `java -cp build Concordanator`
+5. Enjoy your concordances.
 
 ## Things that don't work
 Most of the commands don't work. The functionality is in the library, however testing is not complete and
