@@ -1,5 +1,7 @@
 package ClassLibrary;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
 import java.util.Set;
+import javax.swing.event.EventListenerList;
 
 
 /***
@@ -21,41 +24,43 @@ public class Concord implements Serializable{
     private HashMap<String, Word> concord;
     private ArrayList<String> unique_words, common_words;
     private HashMap<String, Integer> all_appearances,appearance_ranks;
+    private EventListenerList stageListeners;
     Object getFileWords;
     
   
     /**
      * 
+     * @param title title of the book
+     * @param author author of the book
      * @param file_name name of the file to make the Concordance from
+     * @param listener class which receives a custom event.
      * @throws IOException 
      */
-    public Concord(String title, String author, String file_name) throws IOException{
+    public Concord(String title, String author, String file_name, CmdRepl listener) throws IOException{
         this.book_title = title;
         this.book_author = author;
         this.file_name = file_name;
-        //System.out.println("Stage 1: Setting number of lines.");
+        this.stageListeners = new EventListenerList();
+        this.addStageListener(listener);
+        this.fireNextStage(new ActionEvent(this, 1, "\r- Stage 1 of 8 -"));
         this.number_of_lines = set_number_lines();
-        //System.out.println("Stage 2: Setting file lines.");
         this.file_lines = this.set_file_lines();
-        //System.out.println("Stage 3: Setting file words.");
         this.file_words = this.set_file_words();
-        System.out.print("\r|=        | Stage 1 of 9");
         this.flat_words_full = Arrays.toString(this.file_lines).toLowerCase();
-        System.out.print("\r|==       | Stage 2 of 9");
         this.flat_words = flat_words_full.split("[\\s--.,;\\n\\t]");
-        System.out.print("\r|===      | Stage 3 of 9");
+        this.fireNextStage(new ActionEvent(this, 2, "\r- Stage 2 of 8 -"));
         this.common_words = this.set_common_words();
-        System.out.print("\r|======   | Stage 4 of 9");
+        this.fireNextStage(new ActionEvent(this, 3, "\r- Stage 3 of 8 -"));
         this.unique_words = this.set_unique_words();
-        System.out.print("\r|====     | Stage 5 of 9");
+        this.fireNextStage(new ActionEvent(this, 4, "\r- Stage 4 of 8 -"));
         this.all_appearances = this.set_all_appearances();
-        System.out.print("\r|=====    | Stage 6 of 9");
+        this.fireNextStage(new ActionEvent(this, 5, "\r- Stage 5 of 8 -"));
         this.appearance_ranks = this.set_appearance_ranks();
-        System.out.print("\r|=======  | Stage 7 of 9");
+        this.fireNextStage(new ActionEvent(this, 6, "\r- Stage 6 of 8 -"));
         this.concord = this.set_concord();
-        System.out.print("\r|======== | Stage 8 of 9");
+        this.fireNextStage(new ActionEvent(this, 7, "\r- Stage 7 of 8 -"));
         this.save();
-        System.out.print("\r|=========| Stage 9 of 9\n");
+        this.fireNextStage(new ActionEvent(this, 8, "\r- Stage 8 of 8 -"));
     }
     
     public class Word implements Serializable{
@@ -199,6 +204,28 @@ public class Concord implements Serializable{
     
         return file_lines;
     }
+    
+    private void addStageListener(CmdRepl listener) 
+{
+     stageListeners.add(CmdRepl.class, listener);
+}
+    
+    private void fireNextStage(ActionEvent nextStage) 
+{
+     Object[] listeners = stageListeners.getListenerList();
+     // loop through each listener and pass on the event if needed
+     int numListeners = listeners.length;
+     for (int i = 0; i<numListeners; i+=2) 
+     {
+          if (listeners[i]==CmdRepl.class) 
+          {
+               // pass the event to the listeners event dispatch method
+                ((CmdRepl)listeners[i+1]).actionPerformed(nextStage);
+          }            
+     }
+
+
+}
     
     /**
      * Makes a Word object for each unique word in the text and writes it to a hash table
