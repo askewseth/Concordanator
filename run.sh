@@ -1,1 +1,1 @@
-export cols=192; export lines=46; cd build/ && java Concordanator
+export cols=`tput cols`; export lines=`tput lines`; cd build/ && java Concordanator

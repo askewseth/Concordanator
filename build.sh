@@ -4,17 +4,11 @@
 #Author Cory Sabol
 
 # Get the rows and cols of the term
-cols=`tput cols`
-lines=`tput lines`
+#cols=`tput cols`
+#lines=`tput lines`
 build_dir="./build/"
 flag=0
 
-#Export the cols and lines
-export cols=$cols
-export lines=$lines
-
-echo $cols
-echo $lines
 #printenv
 
 #Now check to make sure build/ doesn't already exist
@@ -38,7 +32,7 @@ cp "src/ClassLibrary/commonwords.txt" "build/ClassLibrary/"
 echo ""
 echo "Generating run.sh"
 touch run.sh
-echo "export cols=$cols; export lines=$lines; cd build/ && java Concordanator" > run.sh 
+echo -e "export cols=\u60tput cols\u60; export lines=\u60tput lines\u60; cd build/ && java Concordanator" > run.sh 
 cat run.sh
 chmod +x run.sh
 echo "DONE"
