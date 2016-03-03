@@ -14,7 +14,11 @@ import java.util.concurrent.Executors;
 import java.util.HashMap;
 import java.util.Map;
 import ClassLibrary.Concord.Word;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -22,7 +26,7 @@ import java.util.Set;
  * 
  * This class depends on the Concordance class. 
  */
-public class CmdRepl implements Serializable {
+public class CmdRepl implements ActionListener {
     
     private String[] args;
     private boolean exit;
@@ -41,11 +45,44 @@ public class CmdRepl implements Serializable {
     private final String COMMON_WORDS_FILE = "commonwords.txt";
     private String commonWordFile;
     private boolean commonWordsAvailable;
+    private ActionListener listener;
     private final Map<String, String> env = System.getenv();
 	// These two values only matter on *nix systems right now.
 	// Given more time we would make this work for m$ wangblows as well.
 	private int cols = 80;
 	private int lines = 20;
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        switch (e.getID()){
+            case 1:
+                System.out.print("\r|=       | Stage 1 of 8");
+                break;
+            case 2:
+                System.out.print("\r|==      | Stage 2 of 8");
+                break;
+            case 3:
+                System.out.print("\r|===     | Stage 3 of 8");
+                break;
+            case 4:
+                System.out.print("\r|====    | Stage 4 of 8");
+                break;
+            case 5:
+                System.out.print("\r|=====   | Stage 5 of 8");
+                break;
+            case 6:
+                System.out.print("\r|======  | Stage 6 of 8");
+                break;
+            case 7:
+                System.out.print("\r|======= | Stage 7 of 8");
+                break;
+            case 8:
+                System.out.print("\r|=========| Stage 8 of 8\n");
+                break;
+            default:
+                System.out.println("ERROR:  Invalid action event.");
+        }
+    }
 
     private enum Commands {
         load, 
@@ -80,6 +117,7 @@ public class CmdRepl implements Serializable {
        this.conLoaded = false;
        this.commonWords = new ArrayList<String>();
        this.shelf = new Bookshelf();
+       this.listener = this;
        
        
        this.userDir = System.getProperty("user.dir");
@@ -499,10 +537,13 @@ public class CmdRepl implements Serializable {
         if (bookInformation == null){
             System.out.println("Error: Book not found. Please check the name and try again.");
         } else {
-           try {
                System.out.println("Building the concordance. This may take a moment for large books.");
                long startTime = System.currentTimeMillis();
-            this.concord = new Concord(bookInformation[0], bookInformation[1], bookInformation[2]);
+            try {
+                this.concord = new Concord(bookInformation[0], bookInformation[1], bookInformation[2], this);
+            } catch (IOException ex) {
+                Logger.getLogger(CmdRepl.class.getName()).log(Level.SEVERE, null, ex);
+            }
             long endTime = System.currentTimeMillis();
             this.prompt = "\n" + bookInformation[0] + " by " +bookInformation[1] + " > ";
             this.conLoaded = true;
@@ -514,9 +555,6 @@ public class CmdRepl implements Serializable {
                 minute = " minutes ";
             }
                System.out.println("SUCCESS: The concordance was built and loaded in " + (totalTime/60) + minute + "and " + (totalTime%60) + " seconds.");
-        	} catch (IOException ex) {
-				System.out.println("File Error: The file is not found on the system.");
-        	} 
         } 
     }
     
