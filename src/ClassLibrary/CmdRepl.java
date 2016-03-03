@@ -682,13 +682,13 @@ public class CmdRepl implements Serializable {
 		boolean exit = false;
         
         int chunkNum = 0;
-        int count = 0;
 		String input = "";
 		int i = 0;
         while (i < buff.size() - rem && exit == false) {
             System.out.print(buff.get(i));
-            if ((i + 1) % maxLines == 0) {
-                System.out.println("enter for next, q to quit [" + chunkNum + "/" + (numChunks) + "]");
+			// Sub 2 from maxLines to account for prompt and carret
+            if ((i + 1) % (maxLines - 2) == 0) {
+                System.out.println("enter for next, q to quit [" + (chunkNum + 1) + "/" + (numChunks + 1) + "]");
                 input = in.readLine().toLowerCase();
 				if (input.equals("q")) {
 					exit = true;
@@ -696,7 +696,6 @@ public class CmdRepl implements Serializable {
                 chunkNum++;
             }
 			i++;
-            count++;
         }
 		
 	   	int j = buff.size() - rem;	

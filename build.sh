@@ -15,7 +15,7 @@ export lines=$lines
 
 echo $cols
 echo $lines
-printenv
+#printenv
 
 #Now check to make sure build/ doesn't already exist
 if [ ! -d "$build_dir" ]; then
