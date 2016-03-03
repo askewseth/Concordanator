@@ -20,19 +20,20 @@ Seth Askew
 3. Let NB do it's thing.
 4. You should now be able to run and compile the code from inside NB.
 
-## Building and running from the command line, like a real man/woman >:^)
+## Building and running on Linux, like a real man/woman >:^)
 1. `cd` into the root dir of the project.
-2. execute `javac -sourcepath src src/ClassLibrary/Main.java -d build/`
-3. Once that's done execute `java -cp build ClassLibrary.Main`
-4. if that doesn't work then try `java -cp build ClassLibrary/Main`
-4. Enjoy your concordances.
+2. execute `./build.sh`
+3. Once that's done execute `./run.sh`
+4. If none of this works, then open up an issue and report that jazz.
+5. Enjoy your concordances.
 
 ## Things that don't work
-Most of the commands don't work. The functionality is in the library, however testing is not complete and
-the command line interface doesn't tie everything together just yet.
+1. Searching for phrases (we just kinda forgot about it)
+2. Probably some other things, further testing is needed
 
 #### General Todo:
 1. Document all the things.
+2. Write windows compilation instructions.
 2. Come up with more todos.
 
 #### If you have questions, shoot them at:
