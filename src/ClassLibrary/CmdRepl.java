@@ -14,7 +14,10 @@ import java.util.concurrent.Executors;
 import java.util.HashMap;
 import java.util.Map;
 import ClassLibrary.Concord.Word;
+import java.util.Iterator;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -46,9 +49,9 @@ public class CmdRepl implements Serializable {
     // Given more time we would make this work for m$ wangblows as well.
     private int cols = 80;
     private int lines = 20;
+    private boolean isNix = false;
 
     private enum Commands {
-
         load,
         help,
         listbooks,
@@ -83,11 +86,16 @@ public class CmdRepl implements Serializable {
         this.conLoaded = false;
         this.commonWords = new ArrayList<String>();
         this.shelf = new Bookshelf();
-
+        
         this.userDir = System.getProperty("user.dir");
 
-        for (String k : System.getenv().keySet()) {
-            System.out.println(k + " : " + System.getenv().get(k));
+        for (String k : this.env.keySet()) {
+			if (k.equals("lines")) {
+				this.lines = Integer.parseInt(this.env.get(k));
+			}
+			if (k.equals("cols")) {
+				this.cols = Integer.parseInt(this.env.get(k));
+			}
         }
 
         this.concordDirectory = this.userDir + File.separator + CONCORD_DIRECTORY;    // set the concordance directory.
@@ -159,12 +167,18 @@ public class CmdRepl implements Serializable {
 
     private void evalCmd(ArrayList<String> cmd) {
         List<String> cmdArg = new ArrayList<String>();
-        Commands command;
+        Commands command = Commands.valueOf("invalid");
+
+		if (cmd.size() < 1) {
+			cmd = new ArrayList<String>();
+			cmd.add(" ");
+		}
 
         if (cmd.size() > 1) {
             cmdArg = cmd.subList(1, cmd.size());
-        }
-        try {
+       	} 
+
+		try {
             command = Commands.valueOf(cmd.get(0));
         } catch (IllegalArgumentException e) {
             command = Commands.valueOf("invalid");
@@ -295,7 +309,7 @@ public class CmdRepl implements Serializable {
                 if (!conLoaded) {
                     System.out.println("Error: no concordance loaded.");
                 } else {
-
+                    
                 }
                 break;
             case unload:
@@ -308,6 +322,7 @@ public class CmdRepl implements Serializable {
                         this.conLoaded = false;
                     } else {
                         System.out.println("Incorrect Usage: Unload does not require an argument.");
+
                     }
                 }
                 break;
@@ -419,6 +434,8 @@ public class CmdRepl implements Serializable {
     private void showConSummary() {
         HashMap<String, Word> words = this.concord.getConcord();
         Set<String> keys = words.keySet();
+        String indexLine = "";
+        ArrayList<String> outputBuff = new ArrayList<String>();
 
         System.out.println("Summary of the Concordance: \n"
                 + "Total number of words: " + keys.size() + "\n"
@@ -428,10 +445,23 @@ public class CmdRepl implements Serializable {
         for (String v : words.keySet()) {
             Word w = words.get(v);
             // Ew, but it looks so good when printed..
-            System.out.println(String.format("%-15s%-15s%-15s%s", v,
+            indexLine = String.format("%-15s%-15s%-15s%s", v,
                     w.getAppearanceRank(), w.getNumberLines(),
-                    w.getNumberOccurances()));
+                    w.getNumberOccurances() + "\n");
+            outputBuff.add(indexLine);
         }
+       
+        System.out.println("BUFF SIZE: " + outputBuff.size());
+        System.out.println("MAX LINES: " + this.lines);
+        System.out.println("IS NIX: " + this.isNix);
+        if (outputBuff.size() > this.lines /*&& this.isNix == true*/) {
+            try {
+                this.pageOutput(this.lines, outputBuff);
+            } catch (IOException ex) {
+                Logger.getLogger(CmdRepl.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
     }
 
     private void showSummaryLines() {
@@ -608,6 +638,14 @@ public class CmdRepl implements Serializable {
         }
         return true;
     }
+    
+    private boolean isNix() {
+        if (System.getProperty("os").contains("nix")) {
+            return true;
+        }
+        
+        return false;
+    }
 
     private boolean populateCommonWords() {
         boolean success = false;
@@ -626,5 +664,45 @@ public class CmdRepl implements Serializable {
             }
         }
         return success;
+    }
+    
+    /**
+     * Print out 
+     * @param maxLines
+     * @param maxCols
+     * @param buff
+     * @return 
+     */
+    private void pageOutput(int maxLines, ArrayList<String> buff) throws IOException {
+        Iterator<String> iter = buff.iterator();
+        
+        // We need to chunk up the buff into several arraylists
+        int numChunks = buff.size() / maxLines;
+        int rem = buff.size() % maxLines;
+		boolean exit = false;
+        
+        int chunkNum = 0;
+        int count = 0;
+		String input = "";
+		int i = 0;
+        while (i < buff.size() - rem && exit == false) {
+            System.out.print(buff.get(i));
+            if ((i + 1) % maxLines == 0) {
+                System.out.println("enter for next, q to quit [" + chunkNum + "/" + (numChunks) + "]");
+                input = in.readLine().toLowerCase();
+				if (input.equals("q")) {
+					exit = true;
+				}
+                chunkNum++;
+            }
+			i++;
+            count++;
+        }
+       
+	   	int j = 0;	
+        while (j < buff.size() && exit == false) {
+            System.out.print((buff.get(i)));
+        }
+        System.out.println("END [" + chunkNum + "/" + (numChunks) + "]");
     }
 }
