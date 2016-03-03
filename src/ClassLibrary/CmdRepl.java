@@ -698,10 +698,11 @@ public class CmdRepl implements Serializable {
 			i++;
             count++;
         }
-       
-	   	int j = 0;	
+		
+	   	int j = buff.size() - rem;	
         while (j < buff.size() && exit == false) {
-            System.out.print((buff.get(i)));
+            System.out.print((buff.get(j)));
+			j++;
         }
         System.out.println("END [" + chunkNum + "/" + (numChunks) + "]");
     }
