@@ -16,6 +16,7 @@ import java.util.Map;
 import ClassLibrary.Concord.Word;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,6 +52,7 @@ public class CmdRepl implements ActionListener {
 	// Given more time we would make this work for m$ wangblows as well.
 	private int cols = 80;
 	private int lines = 20;
+        private boolean isNix = false;
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -572,7 +574,7 @@ public class CmdRepl implements ActionListener {
             try {
                 System.out.println("Building the concordance. This may take a moment for large books.");
                 long startTime = System.currentTimeMillis();
-                this.concord = new Concord(bookInformation[0], bookInformation[1], bookInformation[2]);
+                this.concord = new Concord(bookInformation[0], bookInformation[1], bookInformation[2], this);
                 long endTime = System.currentTimeMillis();
                 this.prompt = "\n" + bookInformation[0] + " by " + bookInformation[1] + " > ";
                 this.conLoaded = true;
@@ -585,11 +587,10 @@ public class CmdRepl implements ActionListener {
                 }
                 System.out.println("SUCCESS: The concordance was built and loaded in " + (totalTime / 60) + minute + "and " + (totalTime % 60) + " seconds.");
             } catch (IOException ex) {
-                System.out.println("File Error: The file is not found on the system.");
+                System.out.println("ERROR:  The Concordance failed to be created.");
             }
-               System.out.println("SUCCESS: The concordance was built and loaded in " + (totalTime/60) + minute + "and " + (totalTime%60) + " seconds.");
+            }
         } 
-    }
 
     private void numOccurences(String word) {
         if (!this.commonWords.contains(word)) {
