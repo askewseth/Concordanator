@@ -1,7 +1,4 @@
-package ClassLibrary;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.IO;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
 import java.util.Set;
-import javax.swing.event.EventListenerList;
 
 
 /***
@@ -24,43 +20,41 @@ public class Concord implements Serializable{
     private HashMap<String, Word> concord;
     private ArrayList<String> unique_words, common_words;
     private HashMap<String, Integer> all_appearances,appearance_ranks;
-    private EventListenerList stageListeners;
-    Object getFileWords;
-    
+    private ArrayList<String[]> index = new ArrayList();
   
     /**
      * 
-     * @param title title of the book
-     * @param author author of the book
      * @param file_name name of the file to make the Concordance from
-     * @param listener class which receives a custom event.
      * @throws IOException 
      */
-    public Concord(String title, String author, String file_name, CmdRepl listener) throws IOException{
+    public Concord(String title, String author, String file_name) throws IOException{
         this.book_title = title;
         this.book_author = author;
         this.file_name = file_name;
-        this.stageListeners = new EventListenerList();
-        this.addStageListener(listener);
-        this.fireNextStage(new ActionEvent(this, 1, "\r- Stage 1 of 8 -"));
+        //System.out.println("Stage 1: Setting number of lines.");
         this.number_of_lines = set_number_lines();
+        //System.out.println("Stage 2: Setting file lines.");
         this.file_lines = this.set_file_lines();
+        //System.out.println("Stage 3: Setting file words.");
         this.file_words = this.set_file_words();
+        System.out.print("\r|=        | Stage 1 of 9");
         this.flat_words_full = Arrays.toString(this.file_lines).toLowerCase();
+        System.out.print("\r|==       | Stage 2 of 9");
         this.flat_words = flat_words_full.split("[\\s--.,;\\n\\t]");
-        this.fireNextStage(new ActionEvent(this, 2, "\r- Stage 2 of 8 -"));
+        System.out.print("\r|===      | Stage 3 of 9");
         this.common_words = this.set_common_words();
-        this.fireNextStage(new ActionEvent(this, 3, "\r- Stage 3 of 8 -"));
+        this.index = this.get_index();
+        System.out.print("\r|======   | Stage 4 of 9");
         this.unique_words = this.set_unique_words();
-        this.fireNextStage(new ActionEvent(this, 4, "\r- Stage 4 of 8 -"));
+        System.out.print("\r|====     | Stage 5 of 9");
         this.all_appearances = this.set_all_appearances();
-        this.fireNextStage(new ActionEvent(this, 5, "\r- Stage 5 of 8 -"));
+        System.out.print("\r|=====    | Stage 6 of 9");
         this.appearance_ranks = this.set_appearance_ranks();
-        this.fireNextStage(new ActionEvent(this, 6, "\r- Stage 6 of 8 -"));
+        System.out.print("\r|=======  | Stage 7 of 9");
         this.concord = this.set_concord();
-        this.fireNextStage(new ActionEvent(this, 7, "\r- Stage 7 of 8 -"));
+        System.out.print("\r|======== | Stage 8 of 9");
         this.save();
-        this.fireNextStage(new ActionEvent(this, 8, "\r- Stage 8 of 8 -"));
+        System.out.print("\r|=========| Stage 9 of 9\n");
     }
     
     public class Word implements Serializable{
@@ -204,28 +198,6 @@ public class Concord implements Serializable{
     
         return file_lines;
     }
-    
-    private void addStageListener(CmdRepl listener) 
-{
-     stageListeners.add(CmdRepl.class, listener);
-}
-    
-    private void fireNextStage(ActionEvent nextStage) 
-{
-     Object[] listeners = stageListeners.getListenerList();
-     // loop through each listener and pass on the event if needed
-     int numListeners = listeners.length;
-     for (int i = 0; i<numListeners; i+=2) 
-     {
-          if (listeners[i]==CmdRepl.class) 
-          {
-               // pass the event to the listeners event dispatch method
-                ((CmdRepl)listeners[i+1]).actionPerformed(nextStage);
-          }            
-     }
-
-
-}
     
     /**
      * Makes a Word object for each unique word in the text and writes it to a hash table
@@ -427,29 +399,16 @@ public class Concord implements Serializable{
     //parses commonwords.txt and returns an arraylist containing all the words
     //that should be excluded from the concord
     private ArrayList<String> set_common_words() throws FileNotFoundException, IOException{
-            ArrayList<String> common_words = new ArrayList<String>();
-            File comWordFile = null;
-            if (new File("ClassLibrary" + File.separator + "commonwords.txt").isFile()){
-                comWordFile = new File("ClassLibrary" + File.separator + "commonwords.txt");
-            }
-            else if (new File("src" + File.separator + "ClassLibrary" + File.separator + "commonwords.txt").isFile()){
-                comWordFile = new File("src" + File.separator + "ClassLibrary" + File.separator + "commonwords.txt");
-            }
-            //open file
-            FileReader file_reader = new FileReader(comWordFile);
-            BufferedReader  buffered_reader = new BufferedReader(file_reader);
-            String line;
-            //Write each line in file to element in array
-            while((line = buffered_reader.readLine())!=null){
-                common_words.add(line);
-            }
-            return common_words;
-            
-            
 //            ArrayList<String> common_words = new ArrayList<String>();
-//            
+//            File comWordFile = null;
+//            if (new File("ClassLibrary" + File.separator + "commonwords.txt").isFile()){
+//                comWordFile = new File("ClassLibrary" + File.separator + "commonwords.txt");
+//            }
+//            else if (new File("src" + File.separator + "ClassLibrary" + File.separator + "commonwords.txt").isFile()){
+//                comWordFile = new File("src" + File.separator + "ClassLibrary" + File.separator + "commonwords.txt");
+//            }
 //            //open file
-//            FileReader file_reader = new FileReader("commonwords.txt");
+//            FileReader file_reader = new FileReader(comWordFile);
 //            BufferedReader  buffered_reader = new BufferedReader(file_reader);
 //            String line;
 //            //Write each line in file to element in array
@@ -457,6 +416,19 @@ public class Concord implements Serializable{
 //                common_words.add(line);
 //            }
 //            return common_words;
+            
+            
+            ArrayList<String> common_words = new ArrayList<String>();
+            
+            //open file
+            FileReader file_reader = new FileReader("commonwords.txt");
+            BufferedReader  buffered_reader = new BufferedReader(file_reader);
+            String line;
+            //Write each line in file to element in array
+            while((line = buffered_reader.readLine())!=null){
+                common_words.add(line);
+            }
+            return common_words;
     }
 
     /**
@@ -485,20 +457,19 @@ public class Concord implements Serializable{
     }
     
     /**
-     * saves the serialized concord to filename.con
+     * saves the seralized concord to filename.con
      * @throws FileNotFoundException
      * @throws IOException 
      */
     public void save() throws FileNotFoundException, IOException{
-//        String name = this.file_name.substring(0, this.file_name.length()-4) + ".con";
-//        FileOutputStream fileOut = new FileOutputStream(name);
-//        ObjectOutputStream out = new ObjectOutputStream(fileOut);
-//        out.writeObject(this);
-//        out.close();
-//        fileOut.close();
-        String conFile = this.file_name.substring(0, this.file_name.lastIndexOf(File.separator)) + File.separator + this.book_title + " by " + this.book_author + ".con";
-        IO<Concord> io = new IO<Concord>(conFile);
-        io.serialize(this);
+        String name = this.file_name.substring(0, this.file_name.length()-4) + ".con";
+        FileOutputStream fileOut = new FileOutputStream(name);
+        ObjectOutputStream out = new ObjectOutputStream(fileOut);
+        out.writeObject(this);
+        out.close();
+        fileOut.close();
+//        IO<Concord> io = new IO<Concord>(this.file_name);
+//        io.serialize(this);
     }
     /**
      * Currently only return line numbers that contain the entire phrase,
@@ -507,46 +478,94 @@ public class Concord implements Serializable{
      * @return ArrayList of lines containing line numbers of phrase occurrences
      */
     public ArrayList<Integer> find_phrase(String phrase){
-        ArrayList<Integer> phrase_lines = new ArrayList<Integer>();
+        ArrayList<Integer> phrase_lines = new ArrayList();
         
-        //if phrase not found in file, return empty arraylist
-        if (!this.flat_words_full.contains(phrase)){
-            return phrase_lines;
-        }
         
-        //get words in phrase
-        String[] words = phrase.split("[\\s.,;\\n\\t]");
+        int counter = 0;
+        String[] split_phrase = phrase.toLowerCase().split("[ ]");
         
-        //get line numbers for each word in phrase
-        for (int i = 0; i < words.length; i++) {
-            phrase_lines.add(this.get_number_lines(words[i]));
-        }
-        
-        //find numbers within tolerance
-        phrase_lines.get(0);
-        
-        //lines that completely contain phrase
-        ArrayList<Integer> full_phrase_lines = new ArrayList<Integer>();
-        
-        //parse this.file_lines and see what lines contain whole phrase
-        for(int line = 0; line < this.file_lines.length; line++){
-            if(this.file_lines[line] != null){
-                if(this.file_lines[line].contains(phrase) && !full_phrase_lines.contains(line+1)){
-                    full_phrase_lines.add(line+1);
+//        ArrayList<String[]> newindex = this.get_index();
+        for (String[] word : this.index) {
+            //if first word found
+            if (word[0].equals(split_phrase[0])){
+//            System.out.println("FOUND FIRST WORD LINE NUMBER " + word[1]);
+
+                //check all words in phrase
+                ArrayList<Boolean> match = new ArrayList();
+                for (int i = 0; i < split_phrase.length; i++) {
+//                    System.out.println("\tIN FOR LOOP I = " + i);
+                    if(this.index.get(counter+i)[0].equals(split_phrase[i])){
+//                        System.out.println("\t\tMATCH TRUE");
+                        match.add(true);
+                    }
+                    else{
+//                        System.out.println("\t\tMATCH FALSE");
+//                        System.out.println("\t\t\t Index:" + this.index.get(counter+i)[0]);
+//                        System.out.println("\t\t\t Phrase:"+ split_phrase[i]);
+                        match.add(false);
+                    }
+                }
+                
+                if (!match.contains(false)) {
+//                    System.out.println("\t\t\t\t\tADDING TO PHRASE LINES!!!!!!!!!!!!!!!");
+                    String[] split_num = word[1].split("[ ]");
+                    
+//                    phrase_lines.add(Integer.parseInt(split_num[0]));
+                    phrase_lines.add(Integer.parseInt(word[1])) ;
                 }
             }
+            counter++;
         }
-        
-        return full_phrase_lines;
+        return phrase_lines;
     }
+    
+    
+/**
+ * Gets an index for the book containing each word in the book in sequential order,
+ * along with its line number, word number in that line, and word number in the entire text.
+ * 
+ * Was going to be used as main source of query information but made compile time too long,
+ * only used for phrase searches now. 
+ * 
+ * @return index ArrayListString[] which holds each word, line number, 
+ *         word number, and total word count 
+ */
+    private ArrayList<String[]> get_index() {
+        ArrayList[] file_words = new ArrayList[this.number_of_lines];
+        ArrayList<String[]> index = new ArrayList();
+        //to keep track of total word count
+        int wordCount = 0; 
+        
+        //for each line in the file
+        for (int i = 0; i < this.number_of_lines; i++) {
+            String file_line = this.file_lines[i];
+            if (file_line != null) {
+                //split each string line of the file
+                String[] split_file_line = file_line.split("[\\s.,;:?!--()'\"\\n\\t]");
+                file_words[i] = new ArrayList<String>();
+                //add each word to it's respective list
+                for (int j = 0; j < split_file_line.length; j++) {
+                    if (file_words[i] != null) {
+                        //make sure words are all lowercase
+                        String identifier = Integer.toString(i+1) + ",\t" + Integer.toString(j+1);
+                        String addbit = ", Yes";
+                        if ( !split_file_line[j].toLowerCase().equals("") ) {
+                            addbit = ", No";
+                            wordCount++;
+                        }
+                        String toAdd = split_file_line[j].toLowerCase() + ".\t" + identifier + addbit + ", " + Integer.toString(wordCount);
 
-	/**
-	 * @param String word for which to get array of line numbers associated with it.
-	 * @return ArrayList<Integer> array containing line number on which word occurs.
-	 */
-	public ArrayList<Integer> getWordLines(String word) {
-		ArrayList<Integer> lines = this.getConcord().get(word).getListLines();
+//                        System.out.println("(" + split_file_line[j].toLowerCase() + ")");
 
-		return lines;
-	}
+                        file_words[i].add(toAdd);
+                        String[] ans = {split_file_line[j].toLowerCase(), Integer.toString(i+1), Integer.toString(j+1), Integer.toString(wordCount)};
+                        index.add(ans);
+                    }
+                }
+            }
+
+        }
+        return index;
+    }
+    
 }
