@@ -343,9 +343,9 @@ public final class Bookshelf {
                     }
                 }
             } catch (FileNotFoundException ex) {
-                Logger.getLogger(Concordance.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Concord.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
-                Logger.getLogger(Concordance.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Concord.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 

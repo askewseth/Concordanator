@@ -20,7 +20,7 @@ public class IO<T> implements Serializable {
     private String path;
     
     public IO(String filePath){
-        if (new File(filePath).isFile()) this.path = filePath.substring(0, filePath.length()-4) + ".con";
+        this.path = filePath;
     }
     
     /**
