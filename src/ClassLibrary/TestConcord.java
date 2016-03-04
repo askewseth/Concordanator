@@ -53,9 +53,9 @@ public class TestConcord implements Serializable {
         System.out.print("\r|===      | Stage 3 of 9");
         this.common_words = this.set_common_words();
         System.out.print("\r|======   | Stage 4 of 9");
-        this.unique_words = this.set_unique_words2();
+        this.unique_words = this.set_unique_words();
         System.out.print("\r|====     | Stage 5 of 9");
-        this.all_appearances = this.set_all_appearances2();
+        this.all_appearances = this.set_all_appearances();
         System.out.print("\r|=====    | Stage 6 of 9");
         this.appearance_ranks = this.set_appearance_ranks();
         System.out.print("\r|=======  | Stage 7 of 9");
@@ -68,7 +68,7 @@ public class TestConcord implements Serializable {
     public class Word implements Serializable {
 
         public String word;
-        public ArrayList<Integer> list_lines;
+        public ArrayList<String> list_lines;
         public int number_occurrences, number_lines, appearance_rank;
 
         /**
@@ -77,7 +77,7 @@ public class TestConcord implements Serializable {
          * @param no Number of occurrences for the word
          * @param a Appearance rank of the word
          */
-        public Word(String w, ArrayList<Integer> ll, int no, int a) {
+        public Word(String w, ArrayList<String> ll, int no, int a) {
             this.word = w;
             this.list_lines = ll;
             this.number_lines = this.list_lines.size();
@@ -146,7 +146,7 @@ public class TestConcord implements Serializable {
     public HashMap<String, Word> set_concord() throws IOException {
         HashMap<String, Word> concord = new HashMap<String, Word>();
         for (String word : this.unique_words) {
-            ArrayList<Integer> lines = this.get_list_lines(word);
+            ArrayList<String> lines = this.get_list_lines(word);
             int num_occurrences = this.all_appearances.get(word);
             int app_rank = this.appearance_ranks.get(word);
             Word tword = new Word(word, lines, num_occurrences, app_rank);
@@ -165,7 +165,7 @@ public class TestConcord implements Serializable {
         //exclude all words in the common words file
         for (String word : this.unique_words) {
             if (!(this.common_words.contains(word))) {
-                ArrayList<Integer> lines = this.get_list_lines(word);
+                ArrayList<String> lines = this.get_list_lines(word);
                 int num_occurrences = this.get_number_occurrences(word);
                 int app_rank = this.get_appearance_rank(word);
                 Word tword = new Word(word, lines, num_occurrences, app_rank);
@@ -215,42 +215,7 @@ public class TestConcord implements Serializable {
 //        }
 //    }
 
-    public ArrayList[] set_file_words_index() {
-        ArrayList[] file_words = new ArrayList[this.number_of_lines];
-
-        //to keep track of total word count
-        int wordCount = 0; 
-        
-        //for each line in the file
-        for (int i = 0; i < this.number_of_lines; i++) {
-            String file_line = this.file_lines[i];
-            if (file_line != null) {
-                //split each string line of the file
-                String[] split_file_line = file_line.split("[\\s.,;:?!--()'\"\\n\\t]");
-                file_words[i] = new ArrayList<String>();
-                //add each word to it's respective list
-                for (int j = 0; j < split_file_line.length; j++) {
-                    if (file_words[i] != null) {
-                        //make sure words are all lowercase
-                        String identifier = Integer.toString(i+1) + ",\t" + Integer.toString(j+1);
-                        String addbit = ", Yes";
-                        if ( !split_file_line[j].toLowerCase().equals("") ) {
-                            addbit = ", No";
-                            wordCount++;
-                        }
-                        String toAdd = split_file_line[j].toLowerCase() + ".\t" + identifier + addbit + ", " + Integer.toString(wordCount);
-
-//                        System.out.println("(" + split_file_line[j].toLowerCase() + ")");
-
-                        file_words[i].add(toAdd);
-                    }
-                }
-            }
-
-        }
-        return file_words;
-    }
-    
+   
     public ArrayList<String[]> get_index() {
         ArrayList[] file_words = new ArrayList[this.number_of_lines];
         ArrayList<String[]> index = new ArrayList();
@@ -354,12 +319,8 @@ public class TestConcord implements Serializable {
      * @return
      */
     //Gets the number of lines that a word appears on
-    public int get_number_lines(String target_word) {
+     public int get_number_lines(String target_word) {
         return this.get_list_lines(target_word).size();
-    }
-
-    public int get_number_lines2(String target_word) {
-        return this.get_list_lines2(target_word).size();
     }
     
     /**
@@ -368,33 +329,11 @@ public class TestConcord implements Serializable {
      * @param target_word
      * @return integer number of occurrences for the given word
      */
-    public int get_number_occurrences(String target_word) {
+       public int get_number_occurrences(String target_word) {
         int counter = 0;
-        for (ArrayList<String> str : this.file_words) {
-            if (str != null) {
-                for (String word : str) {
-                    if (target_word.equals(word)) {
-                        counter++;
-                    }
-                }
-            }
-        }
-        return counter;
-    }
-
-    
-    public int get_number_occurrences2(String target_word) {
-        int counter = 0;
-        for (ArrayList file_words_index1 : this.file_words_index) {
-            
-        }
-        for (ArrayList<String> str : this.file_words) {
-            if (str != null) {
-                for (String word : str) {
-                    if (target_word.equals(word)) {
-                        counter++;
-                    }
-                }
+        for (String[] index1 : this.index) {
+            if(index1[0].equals(target_word)){
+                counter++;
             }
         }
         return counter;
@@ -406,16 +345,8 @@ public class TestConcord implements Serializable {
      *
      * @return Hashmap mapping every unique word in text to it's number of
      * appearances
-     */
+     */  
     public HashMap<String, Integer> set_all_appearances() {
-        HashMap<String, Integer> all_appearances = new HashMap<String, Integer>();
-        for (String word : this.unique_words) {
-            all_appearances.put(word, this.get_number_occurrences(word));
-        }
-        return all_appearances;
-    }
-    
-    public HashMap<String, Integer> set_all_appearances2() {
         
         List<String> flatarlist = Arrays.asList(this.flat_words);
         
