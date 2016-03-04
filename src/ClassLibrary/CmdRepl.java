@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  * This class depends on the Concordance class.
  */
 public class CmdRepl implements ActionListener {
-    
+
     private String[] args;
     private boolean exit;
     private String prompt = "> ";
@@ -49,14 +49,14 @@ public class CmdRepl implements ActionListener {
     private ActionListener listener;
     private final Map<String, String> env = System.getenv();
 	// These two values only matter on *nix systems right now.
-	// Given more time we would make this work for m$ wangblows as well.
-	private int cols = 80;
-	private int lines = 20;
-        private boolean isNix = false;
+    // Given more time we would make this work for m$ wangblows as well.
+    private int cols = 80;
+    private int lines = 20;
+    private boolean isNix = false;
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        switch (e.getID()){
+        switch (e.getID()) {
             case 1:
                 System.out.print("\r|=       | Stage 1 of 8");
                 break;
@@ -87,6 +87,7 @@ public class CmdRepl implements ActionListener {
     }
 
     private enum Commands {
+
         load,
         help,
         listbooks,
@@ -114,22 +115,17 @@ public class CmdRepl implements ActionListener {
      * @param args
      */
     public CmdRepl() {
-       //this.args = args;
-       this.reader = new InputStreamReader(System.in);
-       this.in = new BufferedReader(reader);
-       this.exit = false;
-       this.conLoaded = false;
-       this.commonWords = new ArrayList<String>();
-       this.shelf = new Bookshelf();
-       this.listener = this;
-       
-       
-       this.userDir = System.getProperty("user.dir");
-       
-       for (String k : System.getenv().keySet()) {
-			System.out.println(k + " : " + System.getenv().get(k));
-		}
-       
+        //this.args = args;
+        this.reader = new InputStreamReader(System.in);
+        this.in = new BufferedReader(reader);
+        this.exit = false;
+        this.conLoaded = false;
+        this.commonWords = new ArrayList<String>();
+        this.shelf = new Bookshelf();
+        this.listener = this;
+
+        this.userDir = System.getProperty("user.dir");
+
         this.concordDirectory = this.userDir + File.separator + CONCORD_DIRECTORY;    // set the concordance directory.
         this.commonWordFile = this.userDir + File.separator + "ClassLibrary" + File.separator + this.COMMON_WORDS_FILE;
         if (!new File(this.concordDirectory).isDirectory()) {
@@ -201,16 +197,16 @@ public class CmdRepl implements ActionListener {
         List<String> cmdArg = new ArrayList<String>();
         Commands command = Commands.valueOf("invalid");
 
-		if (cmd.size() < 1) {
-			cmd = new ArrayList<String>();
-			cmd.add(" ");
-		}
+        if (cmd.size() < 1) {
+            cmd = new ArrayList<String>();
+            cmd.add(" ");
+        }
 
         if (cmd.size() > 1) {
             cmdArg = cmd.subList(1, cmd.size());
-       	} 
+        }
 
-		try {
+        try {
             command = Commands.valueOf(cmd.get(0));
         } catch (IllegalArgumentException e) {
             command = Commands.valueOf("invalid");
@@ -341,7 +337,7 @@ public class CmdRepl implements ActionListener {
                 if (!conLoaded) {
                     System.out.println("Error: no concordance loaded.");
                 } else {
-                    
+
                 }
                 break;
             case unload:
@@ -482,7 +478,7 @@ public class CmdRepl implements ActionListener {
                     w.getNumberOccurances() + "\n");
             outputBuff.add(indexLine);
         }
-       
+
         System.out.println("BUFF SIZE: " + outputBuff.size());
         System.out.println("MAX LINES: " + this.lines);
         System.out.println("IS NIX: " + this.isNix);
@@ -493,7 +489,7 @@ public class CmdRepl implements ActionListener {
                 Logger.getLogger(CmdRepl.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+
     }
 
     private void showSummaryLines() {
@@ -559,7 +555,7 @@ public class CmdRepl implements ActionListener {
         }
         executor.shutdown();
         while (!executor.isTerminated()) {
-        // Just a loop to simulate a pause in the command line while
+            // Just a loop to simulate a pause in the command line while
             // the concordances are being queried.
         }
         System.out.println();
@@ -589,8 +585,8 @@ public class CmdRepl implements ActionListener {
             } catch (IOException ex) {
                 System.out.println("ERROR:  The Concordance failed to be created.");
             }
-            }
-        } 
+        }
+    }
 
     private void numOccurences(String word) {
         if (!this.commonWords.contains(word)) {
@@ -670,12 +666,12 @@ public class CmdRepl implements ActionListener {
         }
         return true;
     }
-    
+
     private boolean isNix() {
         if (System.getProperty("os").contains("nix")) {
             return true;
         }
-        
+
         return false;
     }
 
@@ -697,43 +693,44 @@ public class CmdRepl implements ActionListener {
         }
         return success;
     }
-    
+
     /**
-     * Print out 
+     * Print out
+     *
      * @param maxLines
      * @param maxCols
      * @param buff
-     * @return 
+     * @return
      */
     private void pageOutput(int maxLines, ArrayList<String> buff) throws IOException {
         Iterator<String> iter = buff.iterator();
-        
+
         // We need to chunk up the buff into several arraylists
         int numChunks = buff.size() / maxLines;
         int rem = buff.size() % maxLines;
-		boolean exit = false;
-        
+        boolean exit = false;
+
         int chunkNum = 0;
-		String input = "";
-		int i = 0;
+        String input = "";
+        int i = 0;
         while (i < buff.size() - rem && exit == false) {
             System.out.print(buff.get(i));
-			// Sub 2 from maxLines to account for prompt and carret
+            // Sub 2 from maxLines to account for prompt and carret
             if ((i + 1) % (maxLines - 2) == 0) {
                 System.out.println("enter for next, q to quit [" + (chunkNum + 1) + "/" + (numChunks + 1) + "]");
                 input = in.readLine().toLowerCase();
-				if (input.equals("q")) {
-					exit = true;
-				}
+                if (input.equals("q")) {
+                    exit = true;
+                }
                 chunkNum++;
             }
-			i++;
+            i++;
         }
-		
-	   	int j = buff.size() - rem;	
+
+        int j = buff.size() - rem;
         while (j < buff.size() && exit == false) {
             System.out.print((buff.get(j)));
-			j++;
+            j++;
         }
         System.out.println("END [" + chunkNum + "/" + (numChunks) + "]");
     }
